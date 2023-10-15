@@ -92,7 +92,15 @@ Debes tener ejecutando la aplicación (levantada con _docker-compose_) en segund
     <img src="./assets/upload.png"/>
 </div>
 
-#### Prueba de 0CR
+#### Prueba de OCR
+
+##### Imagen de prueba
+
+<div align="center">
+    <img src="./assets/test.png"/>
+</div>
+
+##### Resultado
 
 <div align="center">
     <img src="./assets/ocr.png"/>
