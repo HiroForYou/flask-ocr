@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Iniciar Sesión</title>
+    <!-- Agregar enlaces a los archivos de Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="center-align">Iniciar Sesión</h1>
+        <form id="login-form">
+            <div class="input-field">
+                <label for="username">Nombre de usuario</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="input-field">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button class="btn waves-effect waves-light" type="button" id="login-button">Iniciar Sesión</button>
+        </form>
+        <p class="center-align">¿No tienes una cuenta? <a href="/register">Regístrate aquí</a></p>
+    </div>
+
+    <!-- Estilo CSS personalizado para el toast -->
+    <style>
+        .toast-top-center {
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
+
+    <!-- Incluir el script de Materialize para la funcionalidad -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            M.AutoInit();
+
+            class AuthenticationService {
+                async login(username, password) {
+                    try {
+                        const response = await fetch('/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ username, password })
+                        });
+
+                        if (response.status === 200) {
+                            const data = await response.json();
+                            this.handleSuccessfulLogin(data);
+                        } else {
+                            const errorData = await response.json();
+                            this.handleFailedLogin(errorData.message);
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        this.handleFailedLogin('Error en el inicio de sesión');
+                    }
+                }
+
+                handleSuccessfulLogin(data) {
+                    M.toast({ html: 'Inicio de sesión exitoso', classes: 'toast-top-center' });
+                    localStorage.setItem('userData', JSON.stringify(data));
+                    setTimeout(() => {
+                        window.location.href = '/send';
+                    }, 1000);
+                }
+
+                handleFailedLogin(errorMessage) {
+                    M.toast({ html: errorMessage, classes: 'toast-top-center' });
+                }
+            }
+
+            const authService = new AuthenticationService();
+
+            document.getElementById('login-button').addEventListener('click', () => {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                authService.login(username, password);
+            });
+
+            // Detectar presionar Enter en el campo de contraseña
+            document.getElementById('password').addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Evita el envío del formulario por defecto
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    authService.login(username, password);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

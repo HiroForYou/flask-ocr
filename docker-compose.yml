@@ -1,0 +1,25 @@
+version: "3"
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./:/app/
+    command: ["./wait-for-it.sh", "db:5432", "--", "python", "app.py"]
+    depends_on:
+      - db
+    environment:
+      WAIT_HOSTS: db:5432
+  db:
+    image: postgres:latest
+    env_file: .env
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "db", "-p", "5432", "-U", "postgres"]
+      interval: 4s
+      timeout: 20s
+      retries: 5
